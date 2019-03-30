@@ -1,6 +1,27 @@
 #!flask/bin/python
+import os
 from flask import Flask, jsonify, abort, make_response, request, url_for
+from flask_httpauth import HTTPBasicAuth
 
+#-------------- Authorization --------------#
+FLASK_USER = os.environ.get("FLASK_USER", default=None)
+FLASK_PASS = os.environ.get("FLASK_PASS", default=None)
+if not FLASK_PASS or not FLASK_USER:
+    raise ValueError("Need to set credentials for Flask application")
+
+auth = HTTPBasicAuth()
+
+@auth.get_password
+def get_password(username):
+    if username == FLASK_USER:
+        return FLASK_PASS
+    return None
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 403) # 403 is nicer since it doesn't pop open a login box, but it does violate HTTP standard...
+
+#--------------- Flask setup ---------------#
 app = Flask(__name__)
 
 mail = [
@@ -20,6 +41,7 @@ mail = [
     }
 ]
 
+#------------- Helper functions ------------#
 def make_public_email(email):
     new_email = {}
     for field in email:
@@ -29,6 +51,7 @@ def make_public_email(email):
             new_email[field] = email[field]
     return new_email
 
+#----------------- Routing -----------------#
 # The following is example code, me playing around with making an API
 @app.route('/')
 def index():
@@ -46,6 +69,7 @@ def get_mail_by_id(mail_id):
     return jsonify({'task': email[0]})
 
 @app.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['PUT'])
+@auth.login_required
 def update_mail(mail_id):
     email = [email for email in mail if email['id'] == mail_id]
     if len(email) == 0 or not request.json:
@@ -65,6 +89,7 @@ def update_mail(mail_id):
     return jsonify({'email': email[0]})
 
 @app.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['DELETE'])
+@auth.login_required
 def delete_mail(mail_id):
     email = [email for email in mail if email['id'] == mail_id]
     if len(email) == 0 or not request.json:
@@ -75,6 +100,7 @@ def delete_mail(mail_id):
 
 # This is the only one that does anything
 @app.route('/mailer/api/v1.0/mail', methods=['POST'])
+@auth.login_required
 def send_mail():
     if not request.json or not 'subject' in request.json:
         abort(400)
@@ -97,5 +123,6 @@ def send_mail():
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+#------------------- Main ------------------#
 if __name__ == '__main__':
     app.run(debug=True)
