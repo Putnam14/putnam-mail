@@ -1,5 +1,5 @@
 #!flask/bin/python
-from flask import Flask, jsonify, abort, make_response
+from flask import Flask, jsonify, abort, make_response, request
 
 app = Flask(__name__)
 
@@ -19,7 +19,7 @@ mail = [
         'description': u'When I bring the paper in, I deserve at least two treats. Maybe even a milkbone.'
     }
 ]
-
+# The following is example code, me playing around with making an API
 @app.route('/')
 def index():
     return '''What, this isn't an API!'''
@@ -34,6 +34,21 @@ def get_mail_by_id(mail_id):
     if len(single_mail) == 0:
         abort(404)
     return jsonify({'task': single_mail[0]})
+
+# This is the only one that does anything
+@app.route('/mailer/api/v1.0/mail', methods=['POST'])
+def send_mail():
+    if not request.json or not 'subject' in request.json:
+        abort(400)
+    email = {
+        'email': request.json.get('email',""),
+        'name': request.json.get('name',""),
+        'subject': request.json['subject'],
+        'body': request.json.get('body',"")
+    }
+    mail.append(email)
+    #send_mail(email)
+    return jsonify({'sent': True}), 201
 
 @app.errorhandler(404)
 def not_found(error):
