@@ -70,8 +70,7 @@ def delete_mail(mail_id):
     if len(email) == 0 or not request.json:
         abort(400)
     mail.remove(email[0])
-    return jsonify({'email_to_delete': email[0]})
-    #return jsonify({'result': True, 'message': 'Email deleted'})
+    return jsonify({'result': True, 'message': 'Email deleted', 'email_deleted': email[0]})
 
 
 # This is the only one that does anything
