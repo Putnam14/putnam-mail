@@ -19,11 +19,11 @@ def build_request_body(email):
     name = email['name']
     subject = email['subject']
     body = email['body']
-    if from_email == "":
+    if not from_email:
         from_email = FROM_EMAIL
-    if name == "":
+    if not name:
         name = "Anonymous"
-    if subject == "":
+    if not subject:
         subject = "Portfolio contact form message"
     req_body = {
         "personalizations": [
