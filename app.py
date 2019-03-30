@@ -7,7 +7,7 @@ from flask_httpauth import HTTPBasicAuth
 FLASK_USER = os.environ.get("FLASK_USER", default=None)
 FLASK_PASS = os.environ.get("FLASK_PASS", default=None)
 if not FLASK_PASS or not FLASK_USER:
-    raise ValueError("Need to set credentials for Flask application")
+    raise ValueError("Need to set credentials for Flask application (FLASK_USER and FLASK_PASS")
 
 auth = HTTPBasicAuth()
 
