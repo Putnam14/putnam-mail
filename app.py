@@ -2,6 +2,7 @@
 import os
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from flask_httpauth import HTTPBasicAuth
+from sendgrid import send_mail
 
 #-------------- Authorization --------------#
 FLASK_USER = os.environ.get("FLASK_USER", default=None)
@@ -101,7 +102,7 @@ def delete_mail(mail_id):
 # This is the only one that does anything
 @app.route('/mailer/api/v1.0/mail', methods=['POST'])
 @auth.login_required
-def send_mail():
+def post_mail():
     if not request.json or not 'body' in request.json:
         abort(400)
     if len(mail) == 0:
@@ -115,9 +116,9 @@ def send_mail():
         'subject': request.json.get('subject',""),
         'body': request.json['body']
     }
-    mail.append(email)
-    #send_mail(email)
-    return jsonify({'result': True, 'message': 'Message sent'}), 201
+    #mail.append(email)
+    sent_mail = send_mail(email)
+    return jsonify({'result': True, 'message': 'Message sent', 'email_sent': sent_mail}), 201
 
 @app.errorhandler(404)
 def not_found(error):
