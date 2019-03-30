@@ -102,7 +102,7 @@ def delete_mail(mail_id):
 @app.route('/mailer/api/v1.0/mail', methods=['POST'])
 @auth.login_required
 def send_mail():
-    if not request.json or not 'subject' in request.json:
+    if not request.json or not 'body' in request.json:
         abort(400)
     if len(mail) == 0:
         new_id = 1
@@ -112,8 +112,8 @@ def send_mail():
         'id': new_id,
         'email': request.json.get('email',""),
         'name': request.json.get('name',""),
-        'subject': request.json['subject'],
-        'body': request.json.get('body',"")
+        'subject': request.json.get('subject',""),
+        'body': request.json['body']
     }
     mail.append(email)
     #send_mail(email)
