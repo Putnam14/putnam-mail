@@ -102,7 +102,7 @@ def delete_mail(mail_id):
     if len(email) == 0 or not request.json:
         abort(400)
     mail.remove(email[0])
-    return jsonify({'result': True, 'message': 'Email deleted', 'email_deleted': email[0]})
+    return jsonify({'success': True, 'message': 'Email deleted', 'email_deleted': email[0]})
 
 
 # This is the only one that does anything
@@ -125,7 +125,11 @@ def post_mail():
     }
     #mail.append(email)
     sent_mail = send_mail(email)
-    return jsonify({'result': True, 'message': 'Message sent', 'email_sent': sent_mail}), 201
+    print(sent_mail.status_code)
+    if sent_mail.status_code < 400:
+        return jsonify({'success': True, 'message': 'Message sent'}), sent_mail.status_code
+    else:
+         return jsonify({'success': False, 'message': 'Something went wrong with sending the email.'}), 418
 
 @app.errorhandler(404)
 def not_found(error):
