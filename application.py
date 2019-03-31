@@ -70,7 +70,7 @@ def validate_email(email):
 # The following is example code, me playing around with making an API
 @application.route('/')
 def index():
-    return '''What, this isn't an API!'''
+    return f'Link to mailer API: <a href="{url_for("get_mail", _external=True)}">{url_for("get_mail", _external=True)}</a>'
 
 @application.route('/mailer/api/v1.0/mail', methods=['GET'])
 def get_mail():
