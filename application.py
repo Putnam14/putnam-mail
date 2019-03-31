@@ -26,7 +26,7 @@ def unauthorized():
 #--------------- Flask setup ---------------#
 application = Flask(__name__)
 # Probably don't need authentication when I have CORS, but fun to implement both
-cors = CORS(application, resources={r"/mailer/api/*": {"origins": "bridgerputnam.me"}})
+CORS(application)
 
 if os.environ.get('ENV') != 'production':
     application.config['ENV'] = 'dev'
