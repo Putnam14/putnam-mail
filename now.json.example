@@ -1,3 +1,5 @@
+# Until Zeit officially makes a Flask builder, the following won't work...
+# @liudonghua123's now-flask used to work, but we'll have to wait for an @now/flask builder
 {
     "version": 2,
     "env": {
@@ -8,7 +10,7 @@
         "SENDGRID_API_KEY": "Your_API_Key"
     },
     "builds": [
-      { "src": "*.py", "use": "@liudonghua123/now-flask", "config": { "maxLambdaSize": "30mb" } }
+      { "src": "application.py", "use": "@liudonghua123/now-flask", "config": { "maxLambdaSize": "30mb" } }
     ],
     "routes": [
         { "src": "/.*", "dest": "/"}
