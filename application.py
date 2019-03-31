@@ -23,12 +23,12 @@ def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403) # 403 is nicer since it doesn't pop open a login box, but it does violate HTTP standard...
 
 #--------------- Flask setup ---------------#
-app = Flask(__name__)
+application = Flask(__name__)
 
 if os.environ.get('ENV') != 'production':
-    app.config['ENV'] = 'dev'
-    app.config['DEBUG'] = True
-ENV = app.config['ENV']
+    application.config['ENV'] = 'dev'
+    application.config['DEBUG'] = True
+ENV = application.config['ENV']
 print(f'App is in {ENV} mode')
 
 mail = [
@@ -66,22 +66,22 @@ def validate_email(email):
 
 #----------------- Routing -----------------#
 # The following is example code, me playing around with making an API
-@app.route('/')
+@application.route('/')
 def index():
     return '''What, this isn't an API!'''
 
-@app.route('/mailer/api/v1.0/mail', methods=['GET'])
+@application.route('/mailer/api/v1.0/mail', methods=['GET'])
 def get_mail():
     return jsonify({'mail': [make_public_email(email) for email in mail]})
 
-@app.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['GET'])
+@application.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['GET'])
 def get_mail_by_id(mail_id):
     email = [email for email in mail if email['id'] == mail_id]
     if len(email) == 0:
         abort(404)
     return jsonify({'task': email[0]})
 
-@app.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['PUT'])
+@application.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['PUT'])
 @auth.login_required
 def update_mail(mail_id):
     email = [email for email in mail if email['id'] == mail_id]
@@ -101,7 +101,7 @@ def update_mail(mail_id):
     email[0]['body'] = request.json.get('body',email[0]['body'])
     return jsonify({'email': email[0]})
 
-@app.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['DELETE'])
+@application.route('/mailer/api/v1.0/mail/<int:mail_id>', methods=['DELETE'])
 @auth.login_required
 def delete_mail(mail_id):
     email = [email for email in mail if email['id'] == mail_id]
@@ -112,7 +112,7 @@ def delete_mail(mail_id):
 
 
 # This is the only one that does anything
-@app.route('/mailer/api/v1.0/mail', methods=['POST'])
+@application.route('/mailer/api/v1.0/mail', methods=['POST'])
 @auth.login_required
 def post_mail():
     if not request.json or not 'body' in request.json:
@@ -139,10 +139,10 @@ def post_mail():
         mail.append(email)
         return jsonify({'success': True, 'message': 'Message sent'}), 201
 
-@app.errorhandler(404)
+@application.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 #------------------- Main ------------------#
 if __name__ == '__main__':
-    app.run(port=8080)
+    application.run(port=8080)
