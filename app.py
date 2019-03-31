@@ -27,6 +27,7 @@ app = Flask(__name__)
 
 if os.environ.get('ENV') != 'production':
     app.config['ENV'] = 'dev'
+    app.config['DEBUG'] = True
 ENV = app.config['ENV']
 print(f'App is in {ENV} mode')
 
@@ -144,4 +145,4 @@ def not_found(error):
 
 #------------------- Main ------------------#
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
