@@ -125,7 +125,6 @@ def post_mail():
     }
     #mail.append(email)
     sent_mail = send_mail(email)
-    print(sent_mail.status_code)
     if sent_mail.status_code < 400:
         return jsonify({'success': True, 'message': 'Message sent'}), sent_mail.status_code
     else:
