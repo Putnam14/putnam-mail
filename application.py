@@ -30,6 +30,8 @@ if os.environ.get('ENV') != 'production':
     application.config['DEBUG'] = True
 ENV = application.config['ENV']
 print(f'App is in {ENV} mode')
+print(os.environ.get('FLASK_USER'))
+print(os.environ.get('FLASK_PASS'))
 
 mail = [
     {
