@@ -25,6 +25,11 @@ def unauthorized():
 #--------------- Flask setup ---------------#
 app = Flask(__name__)
 
+if os.environ.get('ENV') != 'production':
+    app.config['ENV'] = 'dev'
+ENV = app.config['ENV']
+print(f'App is in {ENV} mode')
+
 mail = [
     {
         'id': 1,
@@ -123,12 +128,15 @@ def post_mail():
         'subject': request.json.get('subject'),
         'body': request.json['body']
     }
-    #mail.append(email)
-    sent_mail = send_mail(email)
-    if sent_mail.status_code < 400:
-        return jsonify({'success': True, 'message': 'Message sent'}), sent_mail.status_code
+    if ENV == 'production':
+        sent_mail = send_mail(email)
+        if sent_mail.status_code < 400:
+            return jsonify({'success': True, 'message': 'Message sent'}), sent_mail.status_code
+        else:
+            return jsonify({'success': False, 'message': 'Something went wrong with sending the email.'}), 418
     else:
-         return jsonify({'success': False, 'message': 'Something went wrong with sending the email.'}), 418
+        mail.append(email)
+        return jsonify({'success': True, 'message': 'Message sent'}), 201
 
 @app.errorhandler(404)
 def not_found(error):
