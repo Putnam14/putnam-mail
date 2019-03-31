@@ -1,5 +1,5 @@
 #!flask/bin/python
-import os
+import os, re
 from flask import Flask, jsonify, abort, make_response, request, url_for
 from flask_httpauth import HTTPBasicAuth
 from sendgrid import send_mail
@@ -51,6 +51,12 @@ def make_public_email(email):
         else:
             new_email[field] = email[field]
     return new_email
+
+def validate_email(email):
+    # RegEx adapted from https://www.regular-expressions.info/email.html
+    if re.match(r'\b[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,}\b', email):
+        return True
+    return False
 
 #----------------- Routing -----------------#
 # The following is example code, me playing around with making an API
@@ -109,11 +115,12 @@ def post_mail():
         new_id = 1
     else:
         new_id = mail[-1]['id'] + 1
+    email_address = request.json.get('email') if validate_email(request.json.get('email')) else ""
     email = {
         'id': new_id,
-        'email': request.json.get('email',""),
-        'name': request.json.get('name',""),
-        'subject': request.json.get('subject',""),
+        'email': email_address,
+        'name': request.json.get('name'),
+        'subject': request.json.get('subject'),
         'body': request.json['body']
     }
     #mail.append(email)
