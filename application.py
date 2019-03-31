@@ -1,6 +1,7 @@
 #!flask/bin/python
 import os, re
 from flask import Flask, jsonify, abort, make_response, request, url_for
+from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 from sendgrid import send_mail
 
@@ -24,6 +25,8 @@ def unauthorized():
 
 #--------------- Flask setup ---------------#
 application = Flask(__name__)
+# Probably don't need authentication when I have CORS, but fun to implement both
+cors = CORS(application, resources={r"/mailer/api/*": {"origins": "*.bridgerputnam.me"}})
 
 if os.environ.get('ENV') != 'production':
     application.config['ENV'] = 'dev'
