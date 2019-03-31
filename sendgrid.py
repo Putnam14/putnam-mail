@@ -1,5 +1,5 @@
 #!flask/bin/python
-import os
+import os, json
 import requests
 
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', default=None)
@@ -25,7 +25,7 @@ def build_request_body(email):
         name = "Anonymous"
     if not subject:
         subject = "Portfolio contact form message"
-    req_body = {
+    req_body = json.dumps({
         "personalizations": [
             {
                 "to": [
@@ -46,9 +46,15 @@ def build_request_body(email):
                 "value": body
             }
         ]
-    }
+    })
     return req_body
 
 def send_mail(email):
+    headers = {
+        "Authorization": f"Bearer {SENDGRID_API_KEY}",
+        "Content-Type": "application/json"
+    }
     email_body = build_request_body(email)
-    return email_body
+    response = requests.post(sendgrid_url, headers=headers, data=email_body)
+    print(response.text)
+    return response
