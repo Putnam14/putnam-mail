@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "env": {
+        "FLASK_USER": "TestUser",
+        "FLASK_PASS": "TestUserPass",
+        "FROM_EMAIL": "noreply@email.com",
+        "TO_EMAIL": "example+portfolio@email.com",
+        "SENDGRID_API_KEY": "Your_API_Key"
+    },
+    "builds": [
+      { "src": "*.py", "use": "@liudonghua123/now-flask", "config": { "maxLambdaSize": "30mb" } }
+    ],
+    "routes": [
+        { "src": "/.*", "dest": "/"}
+      ]
+  }
